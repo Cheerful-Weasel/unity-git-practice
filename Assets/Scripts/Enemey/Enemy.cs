@@ -1,16 +1,47 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public float speed;
+    public int health;
+    public Sprite[] sprites;
+
+    SpriteRenderer spriteRenderer;
+    Rigidbody2D rigid;
+
+    void Awake()
     {
-        
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        rigid = GetComponent<Rigidbody2D>();
+        rigid.linearVelocity = Vector2.down * speed;
     }
 
-    // Update is called once per frame
-    void Update()
+    void OnHit(int dmg)
     {
-        
+        health -= dmg;
+        spriteRenderer.sprite = sprites[1];
+
+        if(health <= 0)
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    void ReturnSprite()
+    {
+        spriteRenderer.sprite = sprites[0];
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "BorderBullet")
+            Destroy(gameObject);
+        else if (collision.gameObject.tag == "Bullet")
+        {
+            Bullet bullet = collision.gameObject.GetComponent<Bullet>();
+            OnHit(bullet.dmg);
+        }
     }
 }
